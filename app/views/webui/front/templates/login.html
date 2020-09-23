@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Login</title>
+		<style>
+			*{
+				margin:0px;
+				padding: 0px;
+				font-family: Sans-Serif;
+			}
+			html, body {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				width: 100%;
+			}
+			#DivLogin{
+				display: flex;
+				flex-direction: column;
+				width: 80%;
+				padding: 10%;
+				align-items: center;
+				justify-content: center;
+				
+			}
+			#FormLogin {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+			input {
+				width: 100%;
+				border: 1px solid #c9c9c9;
+				border-radius: 4px;
+				padding: 10px;
+				margin-top: 10px;
+			}
+			a {
+				color: #0756ff;
+				text-decoration: none;
+				width: 100%;
+				padding: 10px;
+				margin: 20px 0px;
+			}
+			a:hover {
+				border: 1px solid #0756dd;
+				border-radius: 4px;
+			}
+			#btnPassSee {
+				border-left: 1px solid #c9c9c9;
+				padding: 10px;
+				position: relative;
+				top: 45px;
+				left: 100px;
+				font-size: 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="DivLogin">
+			<div id="FormLogin">
+				<h2>Login</h2>
+				<input type="email"    name="user"   id="uset"    placeholder="Email" v-model="user.user">
+			
+				<label id="btnPassSee" @click="passToogle">Mostrar</label>
+				<input v-if="pass.see == 'on' " type="text"     name="passwd" id="passwd"   placeholder="Senha"  v-model="user.passwd" />
+				<input v-if="pass.see == 'off'" type="password" name="passwd" id="passwd"  placeholder="Senha"  v-model="user.passwd" />
+				
+				<input type="submit"   name="submit" id="submit" value="logar" @click="logar"/>
+				<span><a href="/cadastro/">Não tem uma conta? Cadastre-se!</a></span>
+			</div>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src ="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script>
+			var login = new Vue({
+				el: "#FormLogin",
+				delimiters: ["[%","%]"],
+				data: {
+					pass: {
+						see: 'off'
+					},
+					user: {
+						user: "",
+						passwd: ""
+					}
+				},
+				methods: {
+					logar(){
+						axios.post("/api/v1/login/",{user: this.user})
+						.then(resp => this.validacao("ok",resp))
+						.catch(err => this.validacao("err",err))
+					},
+					validacao(val,resp){
+						if ( val == "ok"){
+							if(resp.status == 200){
+								alert("Logado com sucesso!")
+								window.location.href = "/"
+							} else if (resp.status == 206) {
+								alert("credenciais incompletas")
+							}
+						} else  {
+							var a = resp.toString().split(' ')
+							if ( a.slice(-1) == 401) {
+								alert(" Email ou senha inválidos!")
+							}
+						}
+					},
+					passToogle(){
+						var label = document.getElementById("btnPassSee")
+						if (this.pass.see === "off"){
+							label.innerText= "Ocultar "
+							this.pass.see = "on"
+						} else {
+							label.innerText = "Mostrar"
+							this.pass.see = "off"
+						}
+					}
+				}
+			})
+		</script>
+	</body>
+</html>

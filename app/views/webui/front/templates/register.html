@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Cadastro</title>
+		<style>
+		*{
+			margin: 0px;
+			padding: 0px;
+			font-family: Sans-Serif;
+		}
+			html,body {
+				display: flex;
+				flex-direction: column;
+				height: 100%;
+				width: 100%;
+			}
+			#DivCadastro {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				width: 80%;
+				padding: 10%;
+			}
+			#FormCadastro {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+			}
+			input {
+				border: 1px solid #c9c9c9;
+				border-radius: 4px;
+				padding: 10px;
+				margin: 10px;
+			}
+			a {
+				color: #0756ff;
+				width: 100%;
+				border-radius: 4px;
+				padding: 10px 15px;
+				margin: 10px;
+				text-decoration: none;
+			}
+			a:hover {
+				border: 1px solid #0756ff;
+				border-radius: 4px;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<div id="DivCadastro">
+				<h1>Cadastro</h1>
+				<div id="FormCadastro">
+					<div id="alertErr" v-if="site.errors[0]">
+						<p v-if="site.errors != []">Os Campos <span v-for="err in site.errors"> [% err %], </span> não podem ficar vazio</p>
+					</div>
+				
+					<input type="text" name="name"       id="name"       placeholder="Nome"           v-model="user.name">
+					
+					<input type="text" name="lastname"   id="lastname"   placeholder="Sobrenome"      v-model="user.lastname">
+					
+					<input type="text" name="cpf"        id="cpf"        placeholder="Cpf"            v-model="user.cpf">
+					
+					<input type="text" name="nascimento" id="nascimento" placeholder="nascimento"     v-model="user.nascimento">
+					
+					<input type="text" name="tel"        id="tel"        placeholder="Telefone"       v-model="user.tel">
+					
+					<input type="text" name="email"      id="email"      placeholder="Email"          v-model="user.email">
+					
+					<input type="text" name="passwd"     id="passwd"     placeholder="Senha"          v-model="user.passwd">
+					<input type="text" name="passwd2"    id="passwd2"    placeholder="Repita a Senha" v-model="user.passwd2">
+					
+					<input type="text" name="cep"        id="cep"        placeholder="CEP"            v-model="user.cep">
+					
+					<input type="text" name="address"   id="address"   placeholder="Endereço"       v-model="user.address">
+					
+					<input type="text" name="city"     id="city"     placeholder="city"         v-model="user.city">
+					
+					<input type="text" name="state"     id="state"     placeholder="state"         v-model="user.state">
+					
+					<input type="submit" name="submit"   id="submit" value="submit"  @click="cadastrar" />
+					<span><a href="/login/">Já tem uma conta? Faça o login!</a></span>
+				</div>
+			</div>
+		</div>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+		<script src ="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+		<script>
+			var app = new Vue({
+				el: "#FormCadastro",
+				delimiters: ["[%","%]"],
+				data: {
+					site: {
+						errors: []
+					},
+					user: {
+						name: "",
+						lastname: "",
+						cpf: "",
+						nascimento: "",
+						tel: "",
+						email: "",
+						passwd: "",
+						passwd2: "",
+						cep: "",
+						address: "",
+						city: "",
+						state: ""
+					}
+				},
+				methods: {
+					cadastrar(){
+						axios.post("/api/v1/cadastro/",{user:this.user})
+						.then(resp => this.validacao("ok",resp))
+						.catch(err => this.validacao("err",err))
+					},
+					validacao(val,resp) {
+						if (val=== "ok"){
+							if (resp.status === 201){
+								alert("Cadastro Realizado Com Sucesso!");
+								window.location.href = "/";
+							} else if( resp.status == 206 ) {
+								this.site.errors = resp.data
+							}
+						} else {
+							alert(resp)
+						}
+					}
+				}
+			})
+		</script>
+	</body>
+</html>
